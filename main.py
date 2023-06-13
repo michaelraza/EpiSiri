@@ -1,18 +1,30 @@
+#Importation
 from fastapi import FastAPI, Body, HTTPException, Response, status
 from typing import Optional, Union
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
+from bson import ObjectId
+from schematics.models import Model
+import connection
 api_description = description = """
 #Description 
 C'est une épicerie du futur ou tout le monde pourra payer avec ses Iphones car tout le monde aura inévitablement un Iphone du fait de la pression sociale. D'où le nom EpiSiri, tout le monde pourra payer avec Siri en un claquement de voix. Tous les individus inférieurs (sous Android) devront donc continuer de payer avec leur carte bancaire et risquer de se faire pirater par les pirates du Net
+You will be able to do the CRUD :
+Create 
+Read
+Update
+Delete
 
+For Products, Users and Transactions
 """
 app = FastAPI()
 
-# Data models
+#Root de base
 
-@app.get("/")
+@app.get("/",  tags=["Root"])
 async def root():
         return { "message" : "Est ce que c'est bon pour vous ? " }
+
+#Class Articles
 
 class Articles(BaseModel):
     itemId: int
@@ -28,8 +40,9 @@ class ProductRouter:
         {"itemId": "item_id2", "itemName": "item_name2", "itemPrice": "item_price2"},
         {"itemId": "item_id3", "itemName": "item_name3", "itemPrice": "item_price3"}
     ]
-
-    @app.get("/products")
+    """Pour récuperer tous les articles
+    """
+    @app.get("/products", tags=["Products"])
     async def get_articles():
         return {
             "articles": ProductRouter.articles,
@@ -37,8 +50,9 @@ class ProductRouter:
             "total": len(ProductRouter.articles),
             "skip": 0
         }
-
-    @app.get("/products/{itemId}")
+    """Pour récuperer tous les articles par ID
+    """
+    @app.get("/products/{itemId}", tags=["Products"])
     async def get_item(itemId: int, response: Response):
         try:
             corresponding_product = ProductRouter.articles[itemId - 1]
@@ -48,8 +62,9 @@ class ProductRouter:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Article not found"
             )
-
-    @app.post("/products")
+    """Pour ajouter des articles
+    """
+    @app.post("/products", tags=["Products"])
     async def create_article(payload: Articles, response: Response):
         ProductRouter.articles.append(payload.dict())
         response.status_code = status.HTTP_201_CREATED
@@ -57,7 +72,9 @@ class ProductRouter:
             "message": f"{payload.itemName} added successfully"
         }
 
-    @app.delete("/products/{itemId}")
+    """Pour supprimer des articles par ID
+    """
+    @app.delete("/products/{itemId}", tags=["Products"])
     async def delete_item(itemId: int, response: Response):
         try:
             ProductRouter.articles.pop(itemId - 1)
@@ -68,7 +85,9 @@ class ProductRouter:
                 detail="Item not found"
             )
 
-    @app.put("/products/{itemId}")
+    """Pour ramplacer des articles par ID
+    """
+    @app.put("/products/{itemId}", tags=["Products"])
     async def replace_item(itemId: int, payload: Articles, response: Response):
         try:
             ProductRouter.articles[itemId - 1] = payload.dict()
@@ -91,12 +110,16 @@ class UserRouter:
         {"userId": "user_id2"},
         {"userId": "user_id3"}
     ]
-
-    @app.get("/users")
+    """Pour récuperer tous les utilisateurs
+    """    
+    @app.get("/users", tags=["Users"])
     async def get_users():
         return {"users": UserRouter.users}
-
-    @app.get("/users/{userId}")
+    
+    """Pour récuperer tous l'utilisateur par ID
+    """ 
+    
+    @app.get("/users/{userId}", tags=["Users"])
     async def get_user_by_id(userId: int, response: Response):
         try:
             corresponding_user = UserRouter.users[userId - 1]
@@ -107,7 +130,10 @@ class UserRouter:
                 detail="User not found"
             )
 
-    @app.post("/users")
+    """Pour ajouter des utilisateurs
+    """
+
+    @app.post("/users", tags=["Users"])
     async def create_user(payload: User, response: Response):
         UserRouter.users.append(payload.dict())
         response.status_code = status.HTTP_201_CREATED
@@ -123,11 +149,17 @@ class TransactionRouter:
         {"transactionId": 3, "itemId": 3, "quantity": 3, "amount": 20.0}
     ]
 
-    @app.get("/transactions")
+    """Pour récupérer toutes les transactions
+    """
+    
+    @app.get("/transactions", tags=["Transactions"])
     async def get_transactions():
         return {"transactions": TransactionRouter.transactions}
 
-    @app.get("/transactions/{transactionId}")
+    """Pour récupérer toutes les transactions par ID
+    """
+
+    @app.get("/transactions/{transactionId}", tags=["Transactions"])
     async def get_transaction(transactionId: int, response: Response):
         try:
             corresponding_transaction = TransactionRouter.transactions[transactionId - 1]
@@ -137,8 +169,53 @@ class TransactionRouter:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Transaction not found"
             )
-
-    @app.post("/transactions")
+            
+    """Pour rajouter des transactions
+    """
+    @app.post("/transactions", tags=["Transactions"])
     async def create_transaction(payload: Transactions, response: Response):
         TransactionRouter.transactions.append(payload.dict())
-        response.status_code = status.HTTP_201_CREATED   
+        response.status_code = status.HTTP_201_CREATED  
+
+class Customer(Model):
+    cust_id = Field(default=lambda: str(ObjectId()))
+    cust_email = EmailStr
+    cust_name = Field
+
+# An instance of class User
+newuser = Customer()
+
+# Fonction pour créer et assigner des valeurs à l'instance de la classe Customer créée
+def create_user(email, username):
+    newuser = Customer()
+    newuser.cust_email = email
+    newuser.cust_name = username
+    return dict(newuser)
+
+app = FastAPI()
+
+
+# Our root endpoint
+@app.get("/")
+def index():
+    return {"message": "Welcome to FastAPI World"}
+
+# Endpoint Signup avec la méthode POST
+@app.post("/signup/{email}/{username}")
+def addUser(email, username: str):
+    user_exists = False
+    data = create_user(email, username)
+
+    # Convertir les données en dict pour pouvoir les insérer facilement dans MongoDB
+    dict_data = dict(data)
+
+    # Vérifie si un utilisateur existe avec l'e-mail donné
+    if connection.db.users.find({'cust_email': data['cust_email']}).count() > 0:
+        user_exists = True
+        print("Customer Exists")
+        return {"message": "Customer Exists"}
+
+    # Si l'e-mail n'existe pas, créez l'utilisateur
+    elif not user_exists:
+        connection.db.users.insert_one(dict_data)
+        return {"message": "User Created", "email": dict_data['cust_email'], "name": dict_data['cust_name']} 
