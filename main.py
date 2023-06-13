@@ -1,10 +1,18 @@
 from fastapi import FastAPI, Body, HTTPException, Response, status
 from typing import Optional, Union
 from pydantic import BaseModel
+api_description = description = """
+#Description 
+C'est une épicerie du futur ou tout le monde pourra payer avec ses Iphones car tout le monde aura inévitablement un Iphone du fait de la pression sociale. D'où le nom EpiSiri, tout le monde pourra payer avec Siri en un claquement de voix. Tous les individus inférieurs (sous Android) devront donc continuer de payer avec leur carte bancaire et risquer de se faire pirater par les pirates du Net
 
+"""
 app = FastAPI()
 
 # Data models
+
+@app.get("/")
+async def root():
+        return { "message" : "Est ce que c'est bon pour vous ? " }
 
 class Articles(BaseModel):
     itemId: int
