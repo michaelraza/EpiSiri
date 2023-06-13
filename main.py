@@ -5,9 +5,8 @@ from pydantic import BaseModel, EmailStr, Field
 from bson import ObjectId
 from schematics.models import Model
 import connection
-api_description = description = """
-#Description 
-C'est une épicerie du futur ou tout le monde pourra payer avec ses Iphones car tout le monde aura inévitablement un Iphone du fait de la pression sociale. D'où le nom EpiSiri, tout le monde pourra payer avec Siri en un claquement de voix. Tous les individus inférieurs (sous Android) devront donc continuer de payer avec leur carte bancaire et risquer de se faire pirater par les pirates du Net
+api_description = description = """ 
+En 2077, tous les individus sur Terre ont un Iphone, sans exception. Le monde de demain est peut être déja le monde d'aujourd'hui. Payer ne nécéssite plus de contact, que ce soit humain, physique ni même électronique. D'un claquement de voix, les humains pourront payer et récuperer leur affaires, le seul outil que nous auront réellement besoin c'est d'une connexion internet de très haut débit instantané sans ping, ainsi que d'appareils beaucoup trop chère, mais l'avenir a un prix. C'est la qu'EpiSiri entre en scène, avec nos Iphone légèrement onéreux, nous pourrons choisir, commandé avec la voix et récéptionner les colis juste avec nos beaux Iphones. Voila ce qu'est EpiSiri, l'avenir, mais aussi le présent, elle sera toujours a votre écoute (littéralement).
 You will be able to do the CRUD :
 Create 
 Read
@@ -16,7 +15,21 @@ Delete
 
 For Products, Users and Transactions
 """
-app = FastAPI()
+tags_metadata = [
+    {
+        "name" : "EpiSiri",
+        "description": "Welcome To EpiSiri",
+        "externalsDocs" : {
+            "description": "items external docs",
+            "url": "https://fastapi.tiangolo.com/"
+        }
+    }
+]
+app = FastAPI(
+    title="EpiSiri API",
+    description=api_description,
+    openapi_tags= tags_metadata
+)
 
 #Root de base
 
@@ -192,13 +205,6 @@ def create_user(email, username):
     newuser.cust_name = username
     return dict(newuser)
 
-app = FastAPI()
-
-
-# Our root endpoint
-@app.get("/")
-def index():
-    return {"message": "Welcome to FastAPI World"}
 
 # Endpoint Signup avec la méthode POST
 @app.post("/signup/{email}/{username}")
