@@ -3,7 +3,7 @@ from fastapi import FastAPI, Body, HTTPException, Response, status
 from typing import Optional, Union
 from pydantic import BaseModel, EmailStr, Field
 from bson import ObjectId
-from schematics.models import Model
+from schematics import Model
 import connection
 api_description = description = """ 
 En 2077, tous les individus sur Terre ont un Iphone, sans exception. Le monde de demain est peut être déja le monde d'aujourd'hui. Payer ne nécéssite plus de contact, que ce soit humain, physique ni même électronique. D'un claquement de voix, les humains pourront payer et récuperer leur affaires, le seul outil que nous auront réellement besoin c'est d'une connexion internet de très haut débit instantané sans ping, ainsi que d'appareils beaucoup trop chère, mais l'avenir a un prix. C'est la qu'EpiSiri entre en scène, avec nos Iphone légèrement onéreux, nous pourrons choisir, commandé avec la voix et récéptionner les colis juste avec nos beaux Iphones. Voila ce qu'est EpiSiri, l'avenir, mais aussi le présent, elle sera toujours a votre écoute (littéralement).
