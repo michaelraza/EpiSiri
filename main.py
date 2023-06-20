@@ -10,10 +10,10 @@ import psycopg2 #PostgreSQL
 from psycopg2.extras import RealDictCursor
 #connexion
 connexion = psycopg2.connect(
-    host="localhost",
-    database="EpiSiri",
-    user="postgres",
-    password="root",
+    host="dpg-ci8rn76nqql0lddri59g-a.frankfurt-postgres.render.com",
+    database="episiri_render",
+    user="michael_render",
+    password="myITycl2oBeLOwd9xCC5H2VV05G14wjN",
     cursor_factory=RealDictCursor
 )
 cursor = connexion.cursor() #todo 
