@@ -206,6 +206,7 @@ def create_user(email, username):
     return dict(newuser)
 
 
+
 # Endpoint Signup avec la méthode POST
 @app.post("/signup/{email}/{username}")
 def addUser(email, username: str):
