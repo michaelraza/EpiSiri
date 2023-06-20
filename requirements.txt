@@ -11,3 +11,4 @@ typing_extensions==4.6.3
 uvicorn==0.22.0
 pymongo==4.3.3
 pip==23.1.2
+schematics==2.1.0
