@@ -4,7 +4,24 @@ from typing import Optional, Union
 from pydantic import BaseModel, EmailStr, Field
 from bson import ObjectId
 from schematics.models import Model
-import connection
+import connection #MongoDB
+
+import psycopg2 #PostgreSQL
+from psycopg2.extras import RealDictCursor
+#connexion
+connexion = psycopg2.connect(
+    host="localhost",
+    database="EpiSiri",
+    user="postgres",
+    password="root",
+    cursor_factory=RealDictCursor
+)
+cursor = connexion.cursor() #todo 
+
+
+
+
+
 api_description = description = """ 
 En 2077, tous les individus sur Terre ont un Iphone, sans exception. Le monde de demain est peut être déja le monde d'aujourd'hui. Payer ne nécéssite plus de contact, que ce soit humain, physique ni même électronique. D'un claquement de voix, les humains pourront payer et récuperer leur affaires, le seul outil que nous auront réellement besoin c'est d'une connexion internet de très haut débit instantané sans ping, ainsi que d'appareils beaucoup trop chère, mais l'avenir a un prix. C'est la qu'EpiSiri entre en scène, avec nos Iphone légèrement onéreux, nous pourrons choisir, commandé avec la voix et récéptionner les colis juste avec nos beaux Iphones. Voila ce qu'est EpiSiri, l'avenir, mais aussi le présent, elle sera toujours a votre écoute (littéralement).
 You will be able to do the CRUD :
@@ -40,12 +57,12 @@ async def root():
 #Class Articles
 
 class Articles(BaseModel):
-    itemId: int
-    itemName: str
-    itemPrice: float
-    availability: bool = True
-    rating: Optional[int]
-
+    
+    productName: str
+    productPrice: float
+    productAvailability: bool = True
+    productWeight: float
+    
 class ProductRouter:
     articles = [
         {"itemId": "item_id", "itemName": "item_name", "itemPrice": "item_price"},
@@ -57,10 +74,12 @@ class ProductRouter:
     """
     @app.get("/products", tags=["Products"])
     async def get_articles():
+        cursor.execute("SELECT * FROM article")
+        dbProducts = cursor.fetchall()    
         return {
-            "articles": ProductRouter.articles,
+            "articles": dbProducts,
             "limit": 10,
-            "total": len(ProductRouter.articles),
+            "total": len(dbProducts),
             "skip": 0
         }
     """Pour récuperer tous les articles par ID
@@ -68,48 +87,71 @@ class ProductRouter:
     @app.get("/products/{itemId}", tags=["Products"])
     async def get_item(itemId: int, response: Response):
         try:
-            corresponding_product = ProductRouter.articles[itemId - 1]
-            return corresponding_product
-        except IndexError:
+            cursor.execute(f"SELECT * FROM article WHERE id={itemId}")
+            corresponding_product = cursor.fetchall()
+            if(corresponding_product):
+                return corresponding_product
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Article not found"
+                )
+        except:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Article not found"
-            )
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Article not found"
+                )
     """Pour ajouter des articles
     """
     @app.post("/products", tags=["Products"])
     async def create_article(payload: Articles, response: Response):
-        ProductRouter.articles.append(payload.dict())
+        cursor.execute("INSERT INTO article (name, price_eur, weight_kg) VALUES(%s,%s,%s) RETURNING *;",(payload.productName, payload.productPrice, payload.productWeight))
+        connexion.commit()
         response.status_code = status.HTTP_201_CREATED
         return {
-            "message": f"{payload.itemName} added successfully"
+            "message": f"{payload.productName} added successfully"
         }
 
     """Pour supprimer des articles par ID
     """
     @app.delete("/products/{itemId}", tags=["Products"])
     async def delete_item(itemId: int, response: Response):
-        try:
-            ProductRouter.articles.pop(itemId - 1)
-            response.status_code = status.HTTP_204_NO_CONTENT
-        except IndexError:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Item not found"
-            )
-
+        cursor.execute(f"DELETE FROM article WHERE id={itemId}")
+        connexion.commit()
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return 
+              
     """Pour ramplacer des articles par ID
     """
     @app.put("/products/{itemId}", tags=["Products"])
-    async def replace_item(itemId: int, payload: Articles, response: Response):
+    async def update_item(itemId: int, payload: Articles):
         try:
-            ProductRouter.articles[itemId - 1] = payload.dict()
-            return {"message": f"Item successfully updated: {payload.itemName}"}
-        except IndexError:
+            query = "UPDATE article SET name = %s, price_eur = %s, weight_kg = %s WHERE id = %s RETURNING *"
+            values = (payload.productName, payload.productPrice, payload.productWeight, itemId)
+            cursor.execute(query, values)
+            updated_product = cursor.fetchone()
+            connexion.commit()
+            if updated_product:
+                return {
+                    "message": f"{payload.productName} updated successfully"
+                }
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Article not found"
+                )
+        except Exception as e:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Item not found"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(e)
             )
+            
+
+            
+            
+            
+            
+            
 
 class User(BaseModel):
     username: str
@@ -189,7 +231,7 @@ class TransactionRouter:
     async def create_transaction(payload: Transactions, response: Response):
         TransactionRouter.transactions.append(payload.dict())
         response.status_code = status.HTTP_201_CREATED  
-
+#MONGODB
 class Customer(Model):
     cust_id = Field(default=lambda: str(ObjectId()))
     cust_email = EmailStr
