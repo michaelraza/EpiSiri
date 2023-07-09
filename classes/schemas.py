@@ -7,17 +7,21 @@ from pydantic import BaseModel
 class Product_POST_Body (BaseModel):
     productName: str
     productPrice: float
+    productWeight: float
+    productAvailability: bool
     
 class Article_PATCH_Body (BaseModel):
     productName: str
     productPrice: float
-    availability: bool
+    productWeight: float
+    productAvailability: bool
     
 class Product_GETID_Response(BaseModel): # format de sortie (response)
     id: int
     name: str
-    price: str
-    featured: bool
+    price_eur: str
+    weight_kg: float
+    availability: bool
     class Config: # Lors des réponses, nous avons souvant à utiliser les données sortie de notre database. La Config ORM nous permet de "choisir" les columnes à montrer. 
         orm_mode= True
     
