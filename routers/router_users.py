@@ -9,7 +9,7 @@ router = APIRouter(
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
-async def create_user(user: schemas.UserCreate, db: Session = Depends(database1.get_db)):
+async def create_user(user: schemas.UserCreate, db: Session = Depends(database1.get_cursor)):
     # Check if user already exists
     existing_user = db.query(models.User).filter(models.User.email == user.email).first()
     if existing_user:
@@ -28,7 +28,7 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(database1.
 
 
 @router.get("/{user_id}", response_model=schemas.User)
-async def get_user(user_id: int, db: Session = Depends(database1.get_db)):
+async def get_user(user_id: int, db: Session = Depends(database1.get_cursor)):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(

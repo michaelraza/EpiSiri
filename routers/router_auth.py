@@ -3,8 +3,8 @@ from classes import schemas, database1, models
 from sqlalchemy.orm import Session
 import utilities
 from jose import jwt
-from fastapi import AuthJWT
-from fastapi import AuthJWTException
+from fastapi_jwt_auth import AuthJWT
+from fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi.security import OAuth2PasswordBearer
 # Formulaire de lancement du OAuth /auth
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
@@ -15,7 +15,7 @@ router = APIRouter(
 )
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
-@router.post('', status_code=status.HTTP_201_CREATED)
+@router.post('/login', status_code=status.HTTP_201_CREATED)
 async def auth_customer(
         payload : OAuth2PasswordRequestForm= Depends(), 
         cursor: Session= Depends(database1.get_cursor)
@@ -43,17 +43,6 @@ async def auth_customer(
     token = utilities.generate_token(corresponding_customer.id.value)
     print(token)
     return token
-
-@router.post("/login")
-def login(auth: schemas.UserLogin, authorize: AuthJWT = Depends()):
-    # Authenticate user
-    user = authenticate_user(auth.email, auth.password)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-
-    # Generate access token
-    access_token = authorize.create_access_token(subject=str(user.id))
-    return {"access_token": access_token}
 
 
 @router.get("/me")

@@ -34,6 +34,5 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
-    isAdmin = Column(bool, server_default='FALSE')
-
+    isAdmin = Column(Boolean, server_default='FALSE')
     transactions = relationship('Transactions', back_populates='customer')
