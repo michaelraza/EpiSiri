@@ -36,5 +36,16 @@ class Customer_response (BaseModel):
     class Config: # Importante pour la traduction ORM->DTO
         orm_mode= True
 
+class UserCreate(BaseModel):
+    email: str
+    password: str
 
+
+class User(BaseModel):
+    id: int
+    email: str
+    is_admin: bool
+
+    class Config:
+        orm_mode = True
     

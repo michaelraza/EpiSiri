@@ -28,9 +28,10 @@ class Transactions(Base):
     product_id = Column(Integer, ForeignKey("product.id", ondelete="RESTRICT"), nullable=False) # ondelete permet de choisir la cascade d'action suite à la suppression (supprimer une transation, doit-elle suppimer le customer ou le produit?)
     transaction_date=Column(TIMESTAMP(timezone=True), nullable=False, server_default="now()")
     
-class Users(Base):
+class User(Base):
     __tablename__ = "user"
-    id = Column(Integer, primary_key=True, nullable=False)
-    username = Column(String, nullable=False)
-    password = Column(String, nullable=False)
-    role = Column(String, nullable=False)
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    password = Column(String)
+    is_admin = Column(Boolean, default=False)
