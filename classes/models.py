@@ -19,7 +19,6 @@ class Customers(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-    role = Column(String, nullable=False)  #le champ "role" pour définir le rôle de l'utilisateur e. g. "isAdmin"
     create_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default='now()')
 
 class Transactions(Base):
@@ -29,16 +28,12 @@ class Transactions(Base):
     product_id = Column(Integer, ForeignKey("product.id", ondelete="RESTRICT"), nullable=False) # ondelete permet de choisir la cascade d'action suite à la suppression (supprimer une transation, doit-elle suppimer le customer ou le produit?)
     transaction_date=Column(TIMESTAMP(timezone=True), nullable=False, server_default="now()")
     
-class UserRole(str, Enum):
-    VISITOR = 'visitor'
-    MODERATOR = 'moderator'
-    ADMIN = 'admin'
 
 class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
-    role = Column(Enum(UserRole), default=UserRole.VISITOR)
+    isAdmin = Column(bool, server_default='FALSE')
 
     transactions = relationship('Transactions', back_populates='customer')

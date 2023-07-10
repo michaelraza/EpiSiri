@@ -36,11 +36,6 @@ class Customer_response (BaseModel):
     class Config: # Importante pour la traduction ORM->DTO
         orm_mode= True
 
-class UserRole(str, Enum):
-    VISITOR = 'visitor'
-    MODERATOR = 'moderator'
-    ADMIN = 'admin'
-
 
 class UserBase(BaseModel):
     email: str
@@ -48,12 +43,12 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    role: UserRole
+    isAdmin: bool
 
 
 class User(UserBase):
     id: int
-    role: UserRole
+    isAdmin: bool
 
     class Config:
         orm_mode = True
