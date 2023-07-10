@@ -32,3 +32,7 @@ app.include_router(routers.router_products.router)
 app.include_router(routers.router_customers.router)
 app.include_router(routers.router_transactions.router)
 app.include_router(routers.router_auth.router)
+
+app.get("/")
+async def root():
+    return{"This is EPiSiri, This is the Future, This is our project"}
