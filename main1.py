@@ -11,7 +11,7 @@ from classes.database1 import database_engine
 import classes.models # Import des ORM
 
 #Import des routers
-import routers.router_products, routers.router_customers, routers.router_transactions, routers.router_auth
+import routers.router_products, routers.router_customers, routers.router_transactions, routers.router_auth, routers.router_users
 
 # Créer les tables si elles ne sont pas présente dans la DB
 classes.models.Base.metadata.create_all(bind=database_engine)
@@ -32,3 +32,4 @@ app.include_router(routers.router_products.router)
 app.include_router(routers.router_customers.router)
 app.include_router(routers.router_transactions.router)
 app.include_router(routers.router_auth.router)
+app.include_router(routers.router_users.router)

@@ -1,6 +1,6 @@
-from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, Integer, String, Numeric
+from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, Integer, String, Numeric, Enum
 from sqlalchemy.ext.declarative import declarative_base
-
+from enum import Enum
 # Classe de base pour créer les modèles
 Base = declarative_base()
 
@@ -28,10 +28,16 @@ class Transactions(Base):
     product_id = Column(Integer, ForeignKey("product.id", ondelete="RESTRICT"), nullable=False) # ondelete permet de choisir la cascade d'action suite à la suppression (supprimer une transation, doit-elle suppimer le customer ou le produit?)
     transaction_date=Column(TIMESTAMP(timezone=True), nullable=False, server_default="now()")
     
+class UserRole(str, Enum):
+    VISITOR = 'visitor'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
+    username = Column(String, unique=True, index=True)
     password = Column(String)
+    role = Column(Enum(UserRole), default=UserRole.VISITOR)
     is_admin = Column(Boolean, default=False)

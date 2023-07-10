@@ -2,7 +2,7 @@
 tags_metadata = [
     {
         "name": "Products",
-        "description": "Manage Products. So _fancy_ they have their own docs.",
+        "description": "Manage Products. This is Apple afterall.",
         "externalDocs": {
             "description": "Items external docs",
             "url": "https://fastapi.tiangolo.com/",
@@ -10,10 +10,14 @@ tags_metadata = [
     },
     {
         "name": "Customers",
-        "description": "Create and list customers of our API",
+        "description": "Create and list customers of the API",
     },
     {
         "name": "Transactions",
         "description": "Create and list customer's transactions",
     },
+    {
+        "name": "Users",
+        "description": "Create and manage all the users of the API and database",
+    }
 ]

@@ -2,12 +2,22 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from classes.database1 import get_cursor
 from classes import models, schemas
-
+from router_auth import get_current_user
 router = APIRouter(
     prefix='/products',
     tags=['Products']
 )
+def is_admin(user: models.User = Depends(get_current_user)):
+    # Check if the user is an admin
+    if not user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Insufficient permissions')
 
+def has_permission(user: models.User = Depends(get_current_user)):
+    # Check if the user has permission
+    if not user.has_permission:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Insufficient permissions')
+    
+    
 @router.get('')
 async def get_products(cursor: Session = Depends(get_cursor)):
     print(cursor.query(models.Products))  # Requète SQL générée
@@ -42,7 +52,7 @@ async def create_product(payload: schemas.Product_POST_Body, cursor: Session = D
 
 # DELETE
 @router.delete('/{product_id}', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_product(product_id: int, cursor: Session = Depends(get_cursor)):
+async def delete_product(product_id: int, cursor: Session = Depends(get_cursor), user: models.User = Depends(is_admin)):
     # Recherche sur le produit existe ?
     corresponding_product = cursor.query(models.Products).filter(models.Products.id == product_id)
     if corresponding_product.first():
@@ -58,7 +68,7 @@ async def delete_product(product_id: int, cursor: Session = Depends(get_cursor))
 
 # UPDATE
 @router.patch('/{product_id}')
-async def update_product(product_id: int, payload: schemas.Products_PATCH_Body, cursor: Session = Depends(get_cursor)):
+async def update_product(product_id: int, payload: schemas.Products_PATCH_Body, cursor: Session = Depends(get_cursor), user: models.User = Depends(is_admin)):
     # trouver le produit correspondant
     corresponding_product = cursor.query(models.Products).filter(models.Products.id == product_id)
     if corresponding_product.first():

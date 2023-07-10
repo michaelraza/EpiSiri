@@ -2,7 +2,10 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from classes import schemas, database1, models
 from sqlalchemy.orm import Session
 import utilities
-
+from jose import jwt
+from fastapi import AuthJWT
+from fastapi import AuthJWTException
+from fastapi.security import OAuth2PasswordBearer
 # Formulaire de lancement du OAuth /auth
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
@@ -10,7 +13,7 @@ router = APIRouter(
     prefix='/auth',
     tags=["Auth"]
 )
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 @router.post('', status_code=status.HTTP_201_CREATED)
 async def auth_customer(
@@ -40,3 +43,52 @@ async def auth_customer(
     token = utilities.generate_token(corresponding_customer.id.value)
     print(token)
     return token
+
+@router.post("/login")
+def login(auth: schemas.UserLogin, authorize: AuthJWT = Depends()):
+    # Authenticate user
+    user = authenticate_user(auth.email, auth.password)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    # Generate access token
+    access_token = authorize.create_access_token(subject=str(user.id))
+    return {"access_token": access_token}
+
+
+@router.get("/me")
+def get_user_profile(authorize: AuthJWT = Depends()):
+    try:
+        authorize.jwt_required()
+        current_user_id = authorize.get_jwt_subject()
+        user = get_user_by_id(current_user_id)
+        return user
+    except AuthJWTException:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+
+
+def authenticate_user(email: str, password: str):
+    # Retrieve user from the database based on email
+    user = database1.get_user_by_email(email)
+    if user and utilities.verify_password(password, user.password):
+        return user
+    return None
+
+
+def get_user_by_id(user_id: str):
+    # Retrieve user from the database based on user_id
+    user = database1.get_user_by_id(user_id)
+    return user
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, "your_secret_key", algorithms=["HS256"])
+        user_id = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        user = ...  # Retrieve the user from the database based on user_id
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        return user
+    except jwt.JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
