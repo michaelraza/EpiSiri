@@ -33,6 +33,7 @@ class Customer_response (BaseModel):
     id: int
     email:str
     create_at: datetime
+    isAdmin: bool
     class Config: # Importante pour la traduction ORM->DTO
         orm_mode= True
 
