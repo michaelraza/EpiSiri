@@ -23,7 +23,7 @@ secret = "5ae48e781d227cabc077167f64005ff949922d586157d6ae07078fee3f3ad170"
 
 # Generate a JWT token used by /auth
 def generate_token(given_id:int):
-    payload = {"customer_id": given_id}
+    payload = {"Customer_id": given_id}
     encoded_jwt = jwt.encode(payload, secret, algorithm=algo)
     print(encoded_jwt)
     return {
@@ -31,11 +31,11 @@ def generate_token(given_id:int):
         "token_type": "bearer"
     }
 
-# Used to retreive the customer id stored in the JWT
+# Used to retreive the Customer id stored in the JWT
 def decode_token(given_token:str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(given_token, secret, algorithms=algo) # Vérifie si la signature du JWT (en blue) est valide ou non
-        decoded_id = payload.get('customer_id')
+        decoded_id = payload.get('Customer_id')
     except JWTError : # if JWT no provided or without a valide signature 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED

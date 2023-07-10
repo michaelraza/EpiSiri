@@ -26,8 +26,8 @@ class Product_GETID_Response(BaseModel): # format de sortie (response)
         orm_mode= True
     
 class Customer_POST_Body (BaseModel):
-    customerEmail:str
-    customerPassword: str
+    CustomerEmail:str
+    CustomerPassword: str
 
 class Customer_response (BaseModel):
     id: int
@@ -37,18 +37,3 @@ class Customer_response (BaseModel):
         orm_mode= True
 
 
-class UserBase(BaseModel):
-    email: str
-
-
-class UserCreate(UserBase):
-    password: str
-    isAdmin: bool
-
-
-class User(UserBase):
-    id: int
-    isAdmin: bool
-
-    class Config:
-        orm_mode = True

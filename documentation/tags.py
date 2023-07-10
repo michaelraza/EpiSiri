@@ -10,14 +10,18 @@ tags_metadata = [
     },
     {
         "name": "Customers",
-        "description": "Create and list customers of the API",
+        "description": "Create and list Customers of the API",
     },
     {
         "name": "Transactions",
-        "description": "Create and list customer's transactions",
+        "description": "Create and list Customer's transactions",
     },
     {
-        "name": "Users",
-        "description": "Create and manage all the users of the API and database",
+        "name": "Customers",
+        "description": "Create and manage all the Customers of the API and database",
+    },
+    {
+        "name": "Auth",
+        "description": "authentication for the Customer",
     }
 ]

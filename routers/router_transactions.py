@@ -24,9 +24,9 @@ router= APIRouter(
 async def list_transactions(
     token: Annotated[str, Depends(oauth2_scheme)], 
     cursor: Session = Depends(get_cursor)):
-        # Le décodage du token permet de récupérer l'identifiant du customer
-        decoded_customer_id = utilities.decode_token(token)
-        all_transactions = cursor.query(models.Transactions).filter(models.Transactions.customer_id == decoded_customer_id).all()
+        # Le décodage du token permet de récupérer l'identifiant du Customer
+        decoded_Customer_id = utilities.decode_token(token)
+        all_transactions = cursor.query(models.Transactions).filter(models.Transactions.Customer_id == decoded_Customer_id).all()
         return all_transactions # data format à ajuster cela besoin
 
 
@@ -39,8 +39,8 @@ async def create_transaction(
     payload:transaction_post,
     cursor: Session = Depends(get_cursor)
     ):
-    decoded_customer_id = utilities.decode_token(token)
-    new_transaction= models.Transactions(customer_id=decoded_customer_id, product_id=payload.product_id)
+    decoded_Customer_id = utilities.decode_token(token)
+    new_transaction= models.Transactions(Customer_id=decoded_Customer_id, product_id=payload.product_id)
     try : 
         cursor.add(new_transaction)
         cursor.commit()

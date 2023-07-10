@@ -12,7 +12,7 @@ En 2077, tous les individus sur Terre ont un iPhone, sans exception. Le monde de
 - Update (Mettre à jour)
 - Delete (Supprimer)
 
-Pour Products, Users and Transactions
+Pour Products, Customers and Transactions
 
 ## Products
 
