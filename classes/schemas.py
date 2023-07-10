@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-
+from enum import Enum
 # DTO : Data Transfert Object
 # Représente la structure de la données (data type) en entrée ou en sortie de notre API.
 
@@ -36,16 +36,24 @@ class Customer_response (BaseModel):
     class Config: # Importante pour la traduction ORM->DTO
         orm_mode= True
 
-class UserCreate(BaseModel):
+class UserRole(str, Enum):
+    VISITOR = 'visitor'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+
+
+class UserBase(BaseModel):
     email: str
+
+
+class UserCreate(UserBase):
     password: str
+    role: UserRole
 
 
-class User(BaseModel):
+class User(UserBase):
     id: int
-    email: str
-    is_admin: bool
+    role: UserRole
 
     class Config:
         orm_mode = True
-    

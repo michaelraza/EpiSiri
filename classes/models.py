@@ -39,5 +39,5 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     password = Column(String)
-    role = Column(Enum(UserRole), default=UserRole.VISITOR)
+    role = Column(Enum(UserRole), default=UserRole.ADMIN)
     is_admin = Column(Boolean, default=False)
