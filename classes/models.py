@@ -1,5 +1,6 @@
 from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, Integer, String, Numeric, Enum
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 from enum import Enum
 # Classe de base pour créer les modèles
 Base = declarative_base()
@@ -35,9 +36,9 @@ class UserRole(str, Enum):
 
 class User(Base):
     __tablename__ = 'user'
-
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
+    email = Column(String, unique=True, index=True)
     password = Column(String)
-    role = Column(Enum(UserRole), default=UserRole.ADMIN)
-    is_admin = Column(Boolean, default=False)
+    role = Column(Enum(UserRole), default=UserRole.VISITOR)
+
+    transactions = relationship('Transactions', back_populates='customer')
