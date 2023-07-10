@@ -38,7 +38,7 @@ async def create_product(payload: schemas.Product_POST_Body, cursor: Session = D
     cursor.add(new_product)  # Send the query
     cursor.commit()  # Save the staged change
     cursor.refresh(new_product)
-    return {"message": f"New watch {new_product.name} added successfully with id: {new_product.id}"}
+    return {"message": f"New product {new_product.name} added successfully with id: {new_product.id}"}
 
 # DELETE
 @router.delete('/{product_id}', status_code=status.HTTP_204_NO_CONTENT)

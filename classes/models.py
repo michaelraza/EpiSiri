@@ -18,6 +18,7 @@ class Customers(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
+    role = Column(String, nullable=False)  #le champ "role" pour définir le rôle de l'utilisateur e. g. "isAdmin"
     create_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default='now()')
 
 class Transactions(Base):
@@ -26,3 +27,10 @@ class Transactions(Base):
     customer_id= Column(Integer, ForeignKey("customer.id", ondelete="RESTRICT"), nullable=False)  # Les Foreign Keys sont basés sur les clé principales des autres tables mais ce n'est pas obligatoire
     product_id = Column(Integer, ForeignKey("product.id", ondelete="RESTRICT"), nullable=False) # ondelete permet de choisir la cascade d'action suite à la suppression (supprimer une transation, doit-elle suppimer le customer ou le produit?)
     transaction_date=Column(TIMESTAMP(timezone=True), nullable=False, server_default="now()")
+    
+class Users(Base):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True, nullable=False)
+    username = Column(String, nullable=False)
+    password = Column(String, nullable=False)
+    role = Column(String, nullable=False)

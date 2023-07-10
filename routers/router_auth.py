@@ -26,7 +26,7 @@ async def auth_customer(
              status_code=status.HTTP_404_NOT_FOUND,
              detail='email not good'
          )
-    # 3. Vérif sur passwork hashé (Bad practice (normalement 404 dans les deux cas))
+    # 3. Vérif sur passwork hashé 
     valid_pwd = utilities.verify_password(
         payload.password,
         corresponding_customer.password
