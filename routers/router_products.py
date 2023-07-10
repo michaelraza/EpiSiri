@@ -34,7 +34,7 @@ async def get_product(product_id: int, cursor: Session = Depends(get_cursor)):
 # CREATE / POST
 @router.post('', status_code=status.HTTP_201_CREATED)
 async def create_product(payload: schemas.Product_POST_Body, cursor: Session = Depends(get_cursor)):
-    new_product = models.Article(name=payload.productName, price_eur=payload.productPrice, weight_kg=payload.productWeight, availability=payload.productAvailability)  # build the insert
+    new_product = models.Products(name=payload.productName, price_eur=payload.productPrice, weight_kg=payload.productWeight, availability=payload.productAvailability)  # build the insert
     cursor.add(new_product)  # Send the query
     cursor.commit()  # Save the staged change
     cursor.refresh(new_product)
@@ -44,7 +44,7 @@ async def create_product(payload: schemas.Product_POST_Body, cursor: Session = D
 @router.delete('/{product_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(product_id: int, cursor: Session = Depends(get_cursor)):
     # Recherche sur le produit existe ?
-    corresponding_product = cursor.query(models.Article).filter(models.Article.id == product_id)
+    corresponding_product = cursor.query(models.Products).filter(models.Products.id == product_id)
     if corresponding_product.first():
         # Continue to delete
         corresponding_product.delete()  # supprime
@@ -58,9 +58,9 @@ async def delete_product(product_id: int, cursor: Session = Depends(get_cursor))
 
 # UPDATE
 @router.patch('/{product_id}')
-async def update_product(product_id: int, payload: schemas.Article_PATCH_Body, cursor: Session = Depends(get_cursor)):
+async def update_product(product_id: int, payload: schemas.Products_PATCH_Body, cursor: Session = Depends(get_cursor)):
     # trouver le produit correspondant
-    corresponding_product = cursor.query(models.Article).filter(models.Article.id == product_id)
+    corresponding_product = cursor.query(models.Products).filter(models.Products.id == product_id)
     if corresponding_product.first():
         # mise à jour (quoi avec quelle valeur ?) Body -> DTO
         corresponding_product.update({'availability': payload.availability})

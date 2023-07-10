@@ -10,7 +10,7 @@ class Product_POST_Body (BaseModel):
     productWeight: float
     productAvailability: bool
     
-class Article_PATCH_Body (BaseModel):
+class Products_PATCH_Body (BaseModel):
     productName: str
     productPrice: float
     productWeight: float
